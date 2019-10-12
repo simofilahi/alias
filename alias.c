@@ -70,7 +70,7 @@ void PrintList()
 	curr = data->head_ref;
 	while (curr)
 	{
-		ft_putendl(curr->shortcut);
+		ft_putstr(curr->shortcut);
 		ft_putendl(curr->cmd);
 		curr = curr->next;
 	}
@@ -96,6 +96,44 @@ void AliasMatched(char *shortcut, t_aliaspkg *data)
 //	}
 }
 
+void RemoveAlias(char *shortcut)
+{
+	t_aliaspkg *data;
+	t_alias *curr;
+	t_alias *prev;
+
+	data = StoreAddrStruct(NULL);
+	curr = prev = data->head_ref;
+	// this line for test
+	shortcut[ft_strlen(shortcut) - 1] = '\0';
+	shortcut = ft_strjoin(shortcut, "=");
+//	printf("shortcut ==> %s\n curr->shortcut ==> %s\n", shortcut, curr->shortcut);
+	while (curr && !(ft_strcmp(curr->shortcut, shortcut) == 0))
+	{
+		ft_putendl("inside");
+		prev = curr;
+		curr = curr->next;
+	}
+	if (curr == data->head_ref)
+	{
+		ft_putendl(" here head");
+		data->head_ref = curr->next;
+	}
+	else if (curr == data->tail_ref)
+	{
+		ft_putendl("here tail");
+		data->tail_ref = prev;
+	}
+	else
+		prev->next = curr->next;
+	ft_strdel(&curr->shortcut);
+	ft_strdel(&curr->cmd);
+	free(curr);
+	printf("head->shortcut ==> %s\n tail->shortcut ==> %s\n", data->head_ref->shortcut, data->tail_ref->shortcut);
+		PrintList();
+	
+}
+
 int main(int ac, char **av)
 {
 	(void)ac;
@@ -110,10 +148,10 @@ int main(int ac, char **av)
 		ft_bzero(buff, 1024);
 		read(0, buff, sizeof(buff));
 		ImportAliasFileContent();
-		PushToList(buff);
-		AliasMatched(buff);
+	//	PushToList(buff);
+	//	AliasMatched(buff);
 		RemoveAlias(buff);
-		PrintList();
+		//PrintList();
 	}
 	return (0);
 }
