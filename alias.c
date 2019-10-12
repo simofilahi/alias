@@ -101,37 +101,39 @@ void RemoveAlias(char *shortcut)
 	t_aliaspkg *data;
 	t_alias *curr;
 	t_alias *prev;
-
+	int	flag;
+	
+	flag = 0;
 	data = StoreAddrStruct(NULL);
+	if (data->head_ref == NULL)
+		return ;
 	curr = prev = data->head_ref;
 	// this line for test
 	shortcut[ft_strlen(shortcut) - 1] = '\0';
 	shortcut = ft_strjoin(shortcut, "=");
-//	printf("shortcut ==> %s\n curr->shortcut ==> %s\n", shortcut, curr->shortcut);
-	while (curr && !(ft_strcmp(curr->shortcut, shortcut) == 0))
+	while (curr)
 	{
-		ft_putendl("inside");
+		if ((ft_strcmp(curr->shortcut, shortcut) == 0) && (flag = 1))
+			break ;
 		prev = curr;
 		curr = curr->next;
 	}
-	if (curr == data->head_ref)
-	{
-		ft_putendl(" here head");
+	if (curr == data->head_ref && flag)
 		data->head_ref = curr->next;
-	}
-	else if (curr == data->tail_ref)
+	else if (curr == data->tail_ref && flag)
 	{
-		ft_putendl("here tail");
+		prev->next = NULL;
 		data->tail_ref = prev;
 	}
-	else
+	else if (flag)
 		prev->next = curr->next;
-	ft_strdel(&curr->shortcut);
-	ft_strdel(&curr->cmd);
-	free(curr);
-	printf("head->shortcut ==> %s\n tail->shortcut ==> %s\n", data->head_ref->shortcut, data->tail_ref->shortcut);
-		PrintList();
-	
+	if (flag)
+	{
+		ft_strdel(&curr->shortcut);
+		ft_strdel(&curr->cmd);
+		free(curr);
+	}
+	PrintList();
 }
 
 int main(int ac, char **av)
@@ -143,11 +145,11 @@ int main(int ac, char **av)
 	data = ft_memalloc(sizeof(data));
 	StoreAddrStruct(data);
 	CreateAliasFile(data);
+	ImportAliasFileContent();
 	while (1)
 	{
 		ft_bzero(buff, 1024);
 		read(0, buff, sizeof(buff));
-		ImportAliasFileContent();
 	//	PushToList(buff);
 	//	AliasMatched(buff);
 		RemoveAlias(buff);
